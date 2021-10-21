@@ -9,7 +9,7 @@ const Header = () => {
                 <Container>
                     <Navbar.Brand className="fw-bold" href="#home"><h2>AspireHive</h2></Navbar.Brand>
                     <Nav className="ms-auto">
-                        <Nav.Link className="fw-bold mx-4" href="#home">Home</Nav.Link>
+                        <Nav.Link as={Link} to="/home" className="fw-bold mx-4">home</Nav.Link>
                         <Nav.Link as={Link} to="/dashboard" className="fw-bold mx-4">Dashboard</Nav.Link>
                         <Nav.Link as={Link} to="/login" className="fw-bold mx-4">Login</Nav.Link>
                     </Nav>

@@ -1,8 +1,22 @@
-import React, { useState } from 'react';
-import { Button, Col, Form, InputGroup } from 'react-bootstrap';
+import React, { useContext, useState } from 'react';
+import { Button, Col, Form } from 'react-bootstrap';
+import initializeAuthentication from './firebase.initialize';
 import './Login.css'
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { UserContext } from '../../App';
+import { useHistory, useLocation } from 'react-router-dom';
+initializeAuthentication();
+
+
+
+const provider = new GoogleAuthProvider();
 
 const Login = () => {
+
+    const [LoggedInUser, setLoggedInUser] = useContext(UserContext)
+    const history = useHistory();
+    const location = useLocation();
+    const { from } = location.state || { from: { pathname: "/" } };
 
     const [user, setUser] = useState({
         isSignIn: false,
@@ -46,6 +60,42 @@ const Login = () => {
         e.preventDefault();
     }
 
+    const handleGoogleSignIn = () => {
+        const auth = getAuth();
+        signInWithPopup(auth, provider)
+            .then((result) => {
+                const user = result.user;
+                const { displayName, email, photoURL } = user;
+                console.log(displayName, email, photoURL)
+                const SignInUser = {
+                    isSignIn: true,
+                    name: displayName,
+                    email: email,
+                    photo: photoURL
+                }
+                setUser(SignInUser);
+                setLoggedInUser(SignInUser);
+                history.replace(from);
+                storeAuthToken();
+
+
+            }).catch((error) => {
+                const errorMessage = error.message;
+                console.log(errorMessage)
+
+            });
+    };
+
+    const storeAuthToken = () => {
+        getAuth.currentUser.getIdToken(/* forceRefresh */ true)
+            .then(function (idToken) {
+                sessionStorage.setItem('token', idToken);
+                history.replace(from);
+            }).catch(function (error) {
+                console.log(error)
+            });
+    };
+
     return (
         <div className="formStyle">
             <div className="d-flex justify-content-center align-items-center">
@@ -81,7 +131,8 @@ const Login = () => {
                         <Form.Group className="mb-3">
                             <Form.Check type="checkbox" onChange={() => setNewUser(!newUser)} label="New user? Registration here." />
                         </Form.Group>
-                        <Button className="text-center" type="submit" variant="success">Submit</Button>
+                        <Button className="text-center" type="submit" variant="success">Submit</Button><br />
+                        <Button onClick={handleGoogleSignIn} className="text-center m-5" type="button" variant="success">google</Button>
                     </Form>
                 </Col>
             </div>

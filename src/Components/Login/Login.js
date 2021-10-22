@@ -2,13 +2,12 @@ import React, { useContext, useState } from 'react';
 import { Button, Col, Form } from 'react-bootstrap';
 import initializeAuthentication from './firebase.initialize';
 import './Login.css'
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { UserContext } from '../../App';
 import { useHistory, useLocation } from 'react-router-dom';
+import swal from 'sweetalert';
+
 initializeAuthentication();
-
-
-
 const provider = new GoogleAuthProvider();
 
 const Login = () => {
@@ -30,6 +29,7 @@ const Login = () => {
     });
     const [newUser, setNewUser] = useState(false);
 
+    // Form validation
     const handleBlur = (e) => {
         let isFieldValid;
         if (e.target.name === 'name') {
@@ -55,85 +55,160 @@ const Login = () => {
 
     }
 
+    //Signing With Email and Password
+
     const handleSubmit = (e) => {
-        console.log(user)
+        if (newUser && user.email && user.password) {
+            const auth = getAuth();
+            createUserWithEmailAndPassword(auth, user.email, user.password)
+                .then((userCredential) => {
+                    const newUserInfo = { ...user }
+                    newUserInfo.success = true;
+                    newUserInfo.error = "";
+                    setUser(newUserInfo)
+                    updateUserName(user.name, user.mobile, user.email)
+                    const { displayName, email, phoneNumber } = userCredential.user;
+                    const signInUser = { name: displayName, email: email, phoneNumber: phoneNumber };
+                    setLoggedInUser(signInUser);
+                    storeAuthToken();
+                    swal({
+                        title: "Registration Successful!",
+                        icon: "success",
+                    });
+                })
+
+                .catch((error) => {
+                    const newUserInfo = { ...user };
+                    newUserInfo.success = false;
+                    newUserInfo.error = error.message;
+                    setUser(newUserInfo);
+                });
+        };
+
+        if (!newUser && user.email && user.password) {
+            const auth = getAuth();
+            signInWithEmailAndPassword(auth, user.email, user.password)
+                .then((userCredential) => {
+                    const newUserInfo = { ...user }
+                    newUserInfo.success = true;
+                    newUserInfo.error = "";
+                    setUser(newUserInfo)
+                    const { displayName, email } = userCredential.user;
+                    const signInUser = { name: displayName, email: email };
+                    setLoggedInUser(signInUser);
+                    storeAuthToken();
+                    swal({
+                        title: "Sign In Successfully!",
+                        icon: "success",
+                    });
+                })
+
+                .catch((error) => {
+                    const newUserInfo = { ...user };
+                    newUserInfo.success = false;
+                    newUserInfo.error = error.message;
+                    setUser(newUserInfo);
+                });
+        }
         e.preventDefault();
-    }
+    };
+
+    // Update user profile
+
+    const updateUserName = (name, phone, email) => {
+        const auth = getAuth();
+        updateProfile(auth.currentUser, {
+            displayName: name, phoneNumber: phone
+        }).then(() => {
+            const signInUser = { name: name, phoneNumber: phone, email: email };
+            setLoggedInUser(signInUser);
+            storeUserData(signInUser);
+        }).catch((error) => {
+            const errorMessage = error.message;
+            alert(errorMessage)
+        });
+    };
+
+
+    //  Singing with GOOGLE
 
     const handleGoogleSignIn = () => {
         const auth = getAuth();
         signInWithPopup(auth, provider)
             .then((result) => {
                 const user = result.user;
-                const { displayName, email, photoURL } = user;
-                console.log(displayName, email, photoURL)
-                const SignInUser = {
+                const { displayName, email, photoURL, phoneNumber } = user;
+                const signInUser = {
                     isSignIn: true,
                     name: displayName,
                     email: email,
-                    photo: photoURL
+                    photo: photoURL,
+                    phoneNumber: phoneNumber
                 }
-                setUser(SignInUser);
-                setLoggedInUser(SignInUser);
-                history.replace(from);
+                setUser(signInUser);
+                setLoggedInUser(signInUser);
                 storeAuthToken();
-
+                storeUserData(signInUser)
 
             }).catch((error) => {
                 const errorMessage = error.message;
-                console.log(errorMessage)
+                alert(errorMessage);
 
             });
     };
 
+    // Store auth token in session storage.
+
     const storeAuthToken = () => {
-        getAuth.currentUser.getIdToken(/* forceRefresh */ true)
+        getAuth().currentUser.getIdToken(/* forceRefresh */ true)
             .then(function (idToken) {
                 sessionStorage.setItem('token', idToken);
                 history.replace(from);
             }).catch(function (error) {
-                console.log(error)
+                alert(error.errorMessage)
             });
     };
+
+    const storeUserData = (data) => {
+        console.log(data)
+    }
 
     return (
         <div className="formStyle">
             <div className="d-flex justify-content-center align-items-center">
                 <Col xs={10} md={4} className="m-5 p-4 shadow">
-                    <h2 className="text-center fw-bold">Login Here</h2>
+                    <h2 className="text-center fw-bold">{newUser ? "Registration Here" : "Login Here"}</h2>
                     <Form onSubmit={handleSubmit} >
                         {newUser &&
                             <Form.Group className="mb-3" >
                                 <Form.Label>Name</Form.Label>
-                                <Form.Control onBlur={handleBlur} type="text" name="name" placeholder="Enter Name" />
+                                <Form.Control onBlur={handleBlur} type="text" name="name" placeholder="Enter Name" required/>
                             </Form.Group>
                         }
                         {newUser &&
                             <Form.Group className="mb-3" >
                                 <Form.Label>Phone Number</Form.Label>
-                                <Form.Control onBlur={handleBlur} type="mobile" name="mobile" placeholder="Enter Number" />
+                                <Form.Control onBlur={handleBlur} type="mobile" name="mobile" placeholder="Enter Number" required/>
                             </Form.Group>
                         }
                         <Form.Group className="mb-3">
                             <Form.Label>Email address</Form.Label>
-                            <Form.Control onBlur={handleBlur} type="email" name="email" placeholder="Enter Email" />
+                            <Form.Control onBlur={handleBlur} type="email" name="email" placeholder="Enter Email" required/>
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Password</Form.Label>
-                            <Form.Control onBlur={handleBlur} type="password" name="password" placeholder="Enter Password" />
+                            <Form.Control onBlur={handleBlur} type="password" name="password" placeholder="Enter Password" required/>
                         </Form.Group>
-
-                        {/* {newUser && <Form.Group className="mb-3">
-                            <Form.Label>Confirm Password</Form.Label>
-                            <Form.Control onBlur={handleBlur} type="password" name="confirmPassword" placeholder="Enter Confirm Password" />
-                        </Form.Group>} */}
-
                         <Form.Group className="mb-3">
                             <Form.Check type="checkbox" onChange={() => setNewUser(!newUser)} label="New user? Registration here." />
                         </Form.Group>
-                        <Button className="text-center" type="submit" variant="success">Submit</Button><br />
+                        <Button className="text-center" type="submit" variant="success">{newUser ? "Registration" : "Sign In"}</Button><br />
                         <Button onClick={handleGoogleSignIn} className="text-center m-5" type="button" variant="success">google</Button>
                     </Form>
+                    <div>
+                        <p className="text-danger fw-bold">{user.error}</p>
+                        {user.success && <p className="text-success fw-bold">User {newUser ? 'created' : 'Logged In'} successfully</p>}
+                    </div>
                 </Col>
             </div>
         </div>

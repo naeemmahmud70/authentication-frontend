@@ -33,7 +33,7 @@ function App() {
           <Route path="/login">
             <Login></Login>
           </Route>
-          <PrivateRoute path="/dashboard">
+          <PrivateRoute path="/">
             <Dashboard></Dashboard>
           </PrivateRoute>
 

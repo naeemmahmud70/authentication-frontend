@@ -10,7 +10,9 @@ import Footer from "./Components/Footer/Footer";
 import Login from "./Components/Login/Login";
 import PrivateRoute from "./Components/Login/PrivateRoute/PrivateRoute";
 import Dashboard from "./Components/Dashboard/Dashboard";
-import Home from "./Components/Home/Home";
+import Users from "./Components/Users/Users";
+import MakeAdmin from "./Components/MakeAdmin/MakeAdmin";
+import NotFound from "./Components/NotFound/NotFound";
 
 export const UserContext = createContext({});
 
@@ -23,19 +25,29 @@ function App() {
         <Header></Header>
         <Switch>
 
-          <Route exact path="/">
-            <Home></Home>
-          </Route>
-          <Route exact path="/home">
-            <Home></Home>
-          </Route>
+          <PrivateRoute exact path="/">
+            <Dashboard></Dashboard>
+          </PrivateRoute>
+
+          <PrivateRoute path="/dashboard">
+            <Dashboard></Dashboard>
+          </PrivateRoute>
 
           <Route path="/login">
             <Login></Login>
           </Route>
-          <PrivateRoute path="/">
-            <Dashboard></Dashboard>
-          </PrivateRoute>
+
+          <Route path="/users">
+            <Users></Users>
+          </Route>
+
+          <Route path="/makeAdmin">
+            <MakeAdmin></MakeAdmin>
+          </Route>
+
+          <Route path="*">
+            <NotFound></NotFound>
+          </Route>
 
         </Switch>
         <Footer></Footer>

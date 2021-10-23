@@ -1,8 +1,8 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../../App';
 import './Sidebar.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faList, faUsers, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
+import { faGripHorizontal, faList, faUsers, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom';
 import { getAuth, signOut } from "firebase/auth";
 import jwt_decode from "jwt-decode";
@@ -12,6 +12,20 @@ import swal from 'sweetalert';
 const Sidebar = () => {
 
     const [LoggedInUser, setLoggedInUser] = useContext(UserContext)
+
+    const [isAdmin, setIsAdmin] = useState(false);
+    console.log(isAdmin)
+
+    useEffect(() => {
+        fetch('http://localhost:5000/isAdmin', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ email: LoggedInUser.email })
+        })
+            .then(res => res.json())
+            .then(data => setIsAdmin(data));
+    });
+
 
     const handleLogOut = () => {
         const auth = getAuth();
@@ -50,24 +64,22 @@ const Sidebar = () => {
             <ul className="list-unstyled">
                 <li>
                     <Link to="/dashboard" className="text-white">
-                        <FontAwesomeIcon icon={faList} /> <span>Dashboard</span>
+                        <FontAwesomeIcon icon={faGripHorizontal} /> <span>Dashboard</span>
                     </Link>
                 </li>
-                <li>
-                    <Link to="/dashboard/registerUsers" className="text-white">
-                        <FontAwesomeIcon icon={faList} /> <span>Registered Users</span>
-                    </Link>
-                </li>
-                <li>
-                    <Link to="/dashboard/loggedInUsers" className="text-white">
-                        <FontAwesomeIcon icon={faList} /> <span>LoggedInUsers</span>
-                    </Link>
-                </li>
-                <li>
-                    <Link to="/dashboard/makeAdmin" className="text-white" >
-                        <FontAwesomeIcon icon={faUsers} /> <span>Make Admin</span>
-                    </Link>
-                </li>
+                {isAdmin && <div>
+                    <li>
+                        <Link to="/users" className="text-white">
+                            <FontAwesomeIcon icon={faList} /> <span>Users</span>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/makeAdmin" className="text-white" >
+                            <FontAwesomeIcon icon={faUsers} /> <span>Make Admin</span>
+                        </Link>
+                    </li>
+                </div>}
+
 
             </ul>
             <div>

@@ -148,7 +148,7 @@ const Login = () => {
                 setUser(signInUser);
                 setLoggedInUser(signInUser);
                 storeAuthToken();
-                // storeLoggedInUserData(signInUser)
+                storeLoggedInUserData(signInUser)
 
             }).catch((error) => {
                 const errorMessage = error.message;
@@ -189,7 +189,7 @@ const Login = () => {
                 alert(error.errorMessage)
             });
     };
-  
+
     //Post loggedIn User data to the database.
 
     const storeLoggedInUserData = (data) => {

@@ -122,7 +122,7 @@ const Login = () => {
         }).then(() => {
             const signInUser = { name: name, phoneNumber: phone, email: email };
             setLoggedInUser(signInUser);
-            storeUserData(signInUser);
+            storeRegisterData(signInUser);
         }).catch((error) => {
             const errorMessage = error.message;
             alert(errorMessage)
@@ -148,7 +148,7 @@ const Login = () => {
                 setUser(signInUser);
                 setLoggedInUser(signInUser);
                 storeAuthToken();
-                storeUserData(signInUser)
+                // storeLoggedInUserData(signInUser)
 
             }).catch((error) => {
                 const errorMessage = error.message;
@@ -169,9 +169,47 @@ const Login = () => {
             });
     };
 
-    const storeUserData = (data) => {
-        console.log(data)
-    }
+    //Post registered user data to the database.
+
+    const storeRegisterData = (data) => {
+        const url = `http://localhost:5000/addRegisterData`
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(res => {
+                if (res.status) {
+                    swal("Done!", "One new blog added successfully!", "success")
+                }
+            })
+            .catch((error) => {
+                alert(error.errorMessage)
+            });
+    };
+  
+    //Post loggedIn User data to the database.
+
+    const storeLoggedInUserData = (data) => {
+        const url = `http://localhost:5000/addLoggedInData`
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(res => {
+                if (res.status) {
+                    swal("Done!", "One new blog added successfully!", "success")
+                }
+            })
+            .catch((error) => {
+                alert(error.errorMessage)
+            });
+    };
 
     return (
         <div className="formStyle">
@@ -182,29 +220,32 @@ const Login = () => {
                         {newUser &&
                             <Form.Group className="mb-3" >
                                 <Form.Label>Name</Form.Label>
-                                <Form.Control onBlur={handleBlur} type="text" name="name" placeholder="Enter Name" required/>
+                                <Form.Control onBlur={handleBlur} type="text" name="name" placeholder="Enter Name" required />
                             </Form.Group>
                         }
                         {newUser &&
                             <Form.Group className="mb-3" >
                                 <Form.Label>Phone Number</Form.Label>
-                                <Form.Control onBlur={handleBlur} type="mobile" name="mobile" placeholder="Enter Number" required/>
+                                <Form.Control onBlur={handleBlur} type="mobile" name="mobile" placeholder="Enter Number" required />
                             </Form.Group>
                         }
                         <Form.Group className="mb-3">
                             <Form.Label>Email address</Form.Label>
-                            <Form.Control onBlur={handleBlur} type="email" name="email" placeholder="Enter Email" required/>
+                            <Form.Control onBlur={handleBlur} type="email" name="email" placeholder="Enter Email" required />
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Password</Form.Label>
-                            <Form.Control onBlur={handleBlur} type="password" name="password" placeholder="Enter Password" required/>
+                            <Form.Control onBlur={handleBlur} type="password" name="password" placeholder="Enter Password" required />
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Check type="checkbox" onChange={() => setNewUser(!newUser)} label="New user? Registration here." />
                         </Form.Group>
                         <Button className="text-center" type="submit" variant="success">{newUser ? "Registration" : "Sign In"}</Button><br />
-                        <Button onClick={handleGoogleSignIn} className="text-center m-5" type="button" variant="success">google</Button>
                     </Form>
+                    <hr />
+                    <div className="text-center">
+                        <Button onClick={handleGoogleSignIn} className="text-center" type="button" variant="success">Login with google</Button>
+                    </div>
                     <div>
                         <p className="text-danger fw-bold">{user.error}</p>
                         {user.success && <p className="text-success fw-bold">User {newUser ? 'created' : 'Logged In'} successfully</p>}

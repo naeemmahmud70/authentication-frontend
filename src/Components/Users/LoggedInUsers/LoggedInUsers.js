@@ -5,7 +5,7 @@ const LoggedInUsers = () => {
     const [users, setUsers] = useState([]);
 
     useEffect(()=>{
-        fetch('http://localhost:5000/loggedInUsersData')
+        fetch('https://salty-fjord-37700.herokuapp.com/loggedInUsersData')
         .then(res => res.json())
         .then(data => setUsers(data))
     }, []);

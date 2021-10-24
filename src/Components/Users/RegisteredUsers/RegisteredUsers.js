@@ -5,7 +5,7 @@ const RegisteredUsers = () => {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        fetch('http://localhost:5000/registeredUsersData')
+        fetch('https://salty-fjord-37700.herokuapp.com/registeredUsersData')
             .then(res => res.json())
             .then(data => setUsers(data))
     }, []);

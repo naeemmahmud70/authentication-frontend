@@ -17,7 +17,7 @@ const Sidebar = () => {
     console.log(isAdmin)
 
     useEffect(() => {
-        fetch('http://localhost:5000/isAdmin', {
+        fetch('https://salty-fjord-37700.herokuapp.com/isAdmin', {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({ email: LoggedInUser.email })

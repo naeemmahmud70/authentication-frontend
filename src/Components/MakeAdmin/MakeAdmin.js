@@ -27,7 +27,7 @@ const MakeAdmin = () => {
     }
 
     const handleSubmit = (e) => {
-        const url = `http://localhost:5000/makeAdmin`
+        const url = `https://salty-fjord-37700.herokuapp.com/makeAdmin`
         fetch(url, {
             method: 'POST',
             headers: {

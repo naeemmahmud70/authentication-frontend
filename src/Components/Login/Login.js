@@ -172,7 +172,7 @@ const Login = () => {
     //Post registered user data to the database.
 
     const storeRegisterData = (data) => {
-        const url = `http://localhost:5000/addRegisterData`
+        const url = `https://salty-fjord-37700.herokuapp.com/addRegisterData`
         fetch(url, {
             method: 'POST',
             headers: {
@@ -181,9 +181,7 @@ const Login = () => {
             body: JSON.stringify(data)
         })
             .then(res => {
-                if (res.status) {
-                    swal("Done!", "One new blog added successfully!", "success")
-                }
+              console.log(res)
             })
             .catch((error) => {
                 alert(error.errorMessage)
@@ -193,7 +191,7 @@ const Login = () => {
     //Post loggedIn User data to the database.
 
     const storeLoggedInUserData = (data) => {
-        const url = `http://localhost:5000/addLoggedInData`
+        const url = `https://salty-fjord-37700.herokuapp.com/addLoggedInData`
         fetch(url, {
             method: 'POST',
             headers: {
@@ -202,9 +200,7 @@ const Login = () => {
             body: JSON.stringify(data)
         })
             .then(res => {
-                if (res.status) {
-                    swal("Done!", "One new blog added successfully!", "success")
-                }
+               console.log(res)
             })
             .catch((error) => {
                 alert(error.errorMessage)
